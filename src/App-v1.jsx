@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const tempMovieData = [
   {
@@ -50,38 +50,9 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const KEY = "1a2061fe";
-
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const query = "er";
-
-  useEffect(function () {
-    async function FetchMovie() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        );
-        if (!res.ok) throw new Error("Something went wrong");
-
-        const data = await res.json();
-        if (data.Response === "False") throw new Error("Movie not Found");
-
-        setMovies(data.Search);
-        console.log(data);
-      } catch (err) {
-        console.error(err.message);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    FetchMovie();
-  }, []);
+  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <>
@@ -91,7 +62,7 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        {/* <Box element={isLoading ? <Loader /> : <MovieList movies={movies} />} />
+        <Box element={<MovieList movies={movies} />} />
         <Box
           element={
             <>
@@ -99,30 +70,16 @@ export default function App() {
               <WatchedMovieList watched={watched} />
             </>
           }
-        /> */}
-        <Box>
-          {isLoading && <Loader />}
-          {!isLoading && !error && <MovieList movies={movies} />}
-          {error && <ErrorMessage message={error} />}
+        />
+        {/* <Box>
+          <MovieList movies={movies} />
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
           <WatchedMovieList watched={watched} />
-        </Box>
+        </Box> */}
       </Main>
     </>
-  );
-}
-
-function Loader() {
-  return <div className="loader">Loading :)</div>;
-}
-
-function ErrorMessage({ message }) {
-  return (
-    <div className="error">
-      <span>⛔</span> {message}
-    </div>
   );
 }
 
@@ -164,7 +121,7 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function Box({ children }) {
+function Box({ element }) {
   const [isOpen, setIsOpen] = useState(true);
   return (
     <div className="box">
@@ -172,7 +129,7 @@ function Box({ children }) {
         {isOpen ? "–" : "+"}
       </button>
 
-      {isOpen && children}
+      {isOpen && element}
     </div>
   );
 }
